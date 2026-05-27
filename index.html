@@ -1,0 +1,1111 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>节能增效智慧监管平台</title>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg-main: #071828;
+      --bg-card: #091f38;
+      --border: #1a4060;
+      --accent: #4df0b4;
+      --text-primary: #c8e6f5;
+      --text-muted: #5a8aaa;
+      --text-dim: #3a6a8a;
+    }
+
+    body {
+      font-family: 'Courier New', Courier, monospace;
+      background: var(--bg-main);
+      color: var(--text-primary);
+      min-height: 100vh;
+      line-height: 1.5;
+    }
+
+    /* ── Header ── */
+    .header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 18px 28px;
+      border-bottom: 1px solid var(--border);
+      background: linear-gradient(180deg, #0a2035 0%, var(--bg-main) 100%);
+    }
+
+    .header__title {
+      font-size: 22px;
+      font-weight: bold;
+      color: var(--accent);
+      letter-spacing: 2px;
+    }
+
+    .header__subtitle {
+      font-size: 12px;
+      color: var(--text-muted);
+      margin-top: 4px;
+      letter-spacing: 1px;
+    }
+
+    .header__right {
+      display: flex;
+      align-items: center;
+      gap: 20px;
+    }
+
+    .header__logo-wrap {
+      flex-shrink: 0;
+      display: flex;
+      align-items: center;
+      line-height: 0;
+    }
+
+    .header__logo {
+      display: block;
+      height: 44px;
+      width: auto;
+      mix-blend-mode: screen;
+    }
+
+    .status-badge {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-size: 13px;
+      color: var(--text-muted);
+    }
+
+    .status-dot {
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+      background: var(--accent);
+      box-shadow: 0 0 8px var(--accent);
+      animation: breathe 2s ease-in-out infinite;
+    }
+
+    @keyframes breathe {
+      0%, 100% { opacity: 1; box-shadow: 0 0 8px var(--accent); transform: scale(1); }
+      50% { opacity: 0.5; box-shadow: 0 0 16px var(--accent); transform: scale(1.15); }
+    }
+
+    .clock {
+      font-size: 18px;
+      color: var(--accent);
+      letter-spacing: 1px;
+      min-width: 220px;
+      text-align: right;
+    }
+
+    /* ── Layout ── */
+    .container {
+      max-width: 1440px;
+      margin: 0 auto;
+      padding: 20px 28px 40px;
+    }
+
+    /* ── Stat Cards ── */
+    .stat-row {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 16px;
+      margin-bottom: 24px;
+    }
+
+    .stat-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      padding: 18px 20px;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .stat-card::before {
+      content: '';
+      position: absolute;
+      top: 0; left: 0; right: 0;
+      height: 2px;
+      background: linear-gradient(90deg, transparent, var(--accent), transparent);
+    }
+
+    .stat-card__label {
+      font-size: 11px;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      letter-spacing: 1px;
+    }
+
+    .stat-card__value {
+      font-size: 28px;
+      font-weight: bold;
+      color: var(--accent);
+      margin: 8px 0 12px;
+    }
+
+    .stat-card__towers {
+      display: flex;
+      justify-content: space-between;
+      font-size: 11px;
+      color: var(--text-dim);
+      border-top: 1px solid var(--border);
+      padding-top: 10px;
+    }
+
+    .stat-card__towers span b {
+      color: var(--text-muted);
+    }
+
+    /* ── Tabs ── */
+    .tab-bar {
+      display: flex;
+      gap: 0;
+      margin-bottom: 20px;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .tab-btn {
+      font-family: inherit;
+      background: transparent;
+      border: none;
+      color: var(--text-muted);
+      padding: 12px 28px;
+      font-size: 13px;
+      cursor: pointer;
+      letter-spacing: 1px;
+      border-bottom: 2px solid transparent;
+      transition: color 0.2s, border-color 0.2s;
+    }
+
+    .tab-btn:hover { color: var(--text-primary); }
+
+    .tab-btn.active {
+      color: var(--accent);
+      border-bottom-color: var(--accent);
+    }
+
+    .tab-panel { display: none; }
+    .tab-panel.active { display: block; }
+
+    /* ── Shared Panel Styles ── */
+    .panel-row {
+      display: grid;
+      grid-template-columns: 1fr 320px;
+      gap: 16px;
+      margin-bottom: 16px;
+    }
+
+    .panel {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      padding: 20px;
+    }
+
+    .panel__title {
+      font-size: 12px;
+      color: var(--text-muted);
+      margin-bottom: 16px;
+      letter-spacing: 1px;
+    }
+
+    .tower-switch, .point-switch {
+      display: flex;
+      gap: 8px;
+      margin-bottom: 16px;
+    }
+
+    .tower-switch-bar {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 16px;
+    }
+
+    .tower-switch-bar .tower-switch {
+      margin-bottom: 0;
+    }
+
+    .tower-compare-label {
+      font-size: 11px;
+      color: var(--text-muted);
+    }
+
+    .tower-compare-label span {
+      color: var(--accent);
+    }
+
+    .btn-clear {
+      font-family: inherit;
+      background: transparent;
+      border: 1px solid var(--border);
+      color: var(--text-dim);
+      padding: 4px 12px;
+      font-size: 11px;
+      cursor: pointer;
+      border-radius: 4px;
+      transition: all 0.2s;
+    }
+
+    .btn-clear:hover {
+      border-color: var(--accent);
+      color: var(--accent);
+    }
+
+    .switch-btn {
+      font-family: inherit;
+      background: transparent;
+      border: 1px solid var(--border);
+      color: var(--text-muted);
+      padding: 6px 18px;
+      font-size: 12px;
+      cursor: pointer;
+      border-radius: 4px;
+      transition: all 0.2s;
+    }
+
+    .switch-btn:hover { border-color: var(--accent); color: var(--accent); }
+
+    .switch-btn.active {
+      background: rgba(77, 240, 180, 0.12);
+      border-color: var(--accent);
+      color: var(--accent);
+    }
+
+    .chart-wrap {
+      position: relative;
+      height: 280px;
+    }
+
+    /* ── Status Panel ── */
+    .status-panel__header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 16px;
+      padding-bottom: 12px;
+      border-bottom: 1px solid rgba(26, 64, 96, 0.5);
+    }
+
+    .status-panel__tower-name {
+      font-size: 14px;
+      color: var(--text-primary);
+    }
+
+    .status-panel__hero {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+      margin-bottom: 16px;
+      padding-bottom: 16px;
+      border-bottom: 1px solid rgba(26, 64, 96, 0.5);
+    }
+
+    .status-panel__hero-item {
+      text-align: center;
+    }
+
+    .status-panel__hero-label {
+      font-size: 11px;
+      color: var(--text-muted);
+      margin-bottom: 6px;
+    }
+
+    .status-panel__hero-value {
+      font-size: 28px;
+      font-weight: bold;
+      color: var(--accent);
+      line-height: 1.1;
+    }
+
+    .status-panel__hint {
+      display: none;
+      text-align: center;
+      padding: 40px 12px;
+      font-size: 12px;
+      color: var(--text-muted);
+      line-height: 1.8;
+    }
+
+    .status-panel--multi .status-panel__detail { display: none; }
+    .status-panel--multi .status-panel__hint { display: block; }
+
+    .status-panel .metric {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 10px 0;
+      border-bottom: 1px solid rgba(26, 64, 96, 0.5);
+    }
+
+    .status-panel .metric:last-child { border-bottom: none; }
+
+    .metric__label { font-size: 12px; color: var(--text-muted); }
+    .metric__value { font-size: 16px; color: var(--accent); font-weight: bold; }
+
+    /* ── Tower Compare Cards ── */
+    .compare-row {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 16px;
+    }
+
+    .compare-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      padding: 16px 20px;
+    }
+
+    .compare-card__header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 12px;
+    }
+
+    .compare-card__tower {
+      font-size: 14px;
+      color: var(--text-primary);
+    }
+
+    .compare-card__badge {
+      display: inline-block;
+      padding: 3px 10px;
+      font-size: 11px;
+      border-radius: 12px;
+      letter-spacing: 1px;
+    }
+
+    .compare-card__cop {
+      font-size: 26px;
+      color: var(--accent);
+      font-weight: bold;
+      margin-bottom: 12px;
+    }
+
+    .compare-card__stats {
+      display: flex;
+      justify-content: space-between;
+      font-size: 11px;
+      color: var(--text-muted);
+    }
+
+    .compare-card__stats b {
+      color: var(--text-primary);
+      font-weight: normal;
+    }
+
+    .compare-section__title {
+      font-size: 12px;
+      color: var(--text-muted);
+      margin-bottom: 12px;
+      letter-spacing: 1px;
+    }
+
+    .site-footer {
+      display: flex;
+      justify-content: space-between;
+      padding: 12px 28px;
+      font-size: 11px;
+      color: var(--text-dim);
+      border-top: 1px solid var(--border);
+      background: transparent;
+    }
+
+    .badge--best { background: rgba(77,240,180,0.15); color: var(--accent); border: 1px solid var(--accent); }
+    .badge--good { background: rgba(90,138,170,0.15); color: #7ab8d8; border: 1px solid #7ab8d8; }
+    .badge--normal { background: rgba(58,106,138,0.15); color: var(--text-muted); border: 1px solid var(--text-muted); }
+
+    /* ── Water Quality ── */
+    .water-metrics .metric__value { font-size: 20px; }
+
+    /* ── Carbon ── */
+    .carbon-right {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 20px;
+      min-height: 280px;
+    }
+
+    .progress-ring { position: relative; width: 160px; height: 160px; }
+
+    .progress-ring svg { transform: rotate(-90deg); }
+
+    .progress-ring__label {
+      position: absolute;
+      inset: 0;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .progress-ring__pct {
+      font-size: 32px;
+      font-weight: bold;
+      color: var(--accent);
+    }
+
+    .progress-ring__text {
+      font-size: 11px;
+      color: var(--text-muted);
+      margin-top: 4px;
+    }
+
+    .carbon-stats {
+      display: flex;
+      gap: 32px;
+      text-align: center;
+    }
+
+    .carbon-stat__value {
+      font-size: 22px;
+      color: var(--accent);
+      font-weight: bold;
+    }
+
+    .carbon-stat__label {
+      font-size: 11px;
+      color: var(--text-muted);
+      margin-top: 4px;
+    }
+
+    @media (max-width: 1100px) {
+      .stat-row { grid-template-columns: repeat(2, 1fr); }
+      .panel-row { grid-template-columns: 1fr; }
+      .compare-row { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Header -->
+  <header class="header">
+    <div>
+      <h1 class="header__title">节能增效智慧监管平台</h1>
+      <p class="header__subtitle">冷水塔组 #1 #2 #3 实时监测</p>
+    </div>
+    <div class="header__right">
+      <div class="status-badge">
+        <span class="status-dot"></span>
+        <span>3个检测点在线</span>
+      </div>
+      <div class="clock" id="clock">--</div>
+      <div class="header__logo-wrap">
+        <img class="header__logo" src="assets/logo.png" alt="平台标识">
+      </div>
+    </div>
+  </header>
+
+  <main class="container">
+
+    <!-- Stat Cards -->
+    <section class="stat-row">
+      <div class="stat-card">
+        <div class="stat-card__label">综合节能率</div>
+        <div class="stat-card__value" id="stat-saving">0%</div>
+        <div class="stat-card__towers">
+          <span>#1 <b>19.2%</b></span>
+          <span>#2 <b>18.1%</b></span>
+          <span>#3 <b>18.5%</b></span>
+        </div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-card__label">累计碳减排</div>
+        <div class="stat-card__value" id="stat-carbon">0 tCO₂</div>
+        <div class="stat-card__towers">
+          <span>#1 <b>982t</b></span>
+          <span>#2 <b>945t</b></span>
+          <span>#3 <b>929t</b></span>
+        </div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-card__label">平均能效比 COP</div>
+        <div class="stat-card__value" id="stat-cop">0.00</div>
+        <div class="stat-card__towers">
+          <span>#1 <b>5.38</b></span>
+          <span>#2 <b>5.21</b></span>
+          <span>#3 <b>5.13</b></span>
+        </div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-card__label">累计节约成本</div>
+        <div class="stat-card__value" id="stat-cost">0.0万元</div>
+        <div class="stat-card__towers">
+          <span>#1 <b>168.2万</b></span>
+          <span>#2 <b>159.8万</b></span>
+          <span>#3 <b>158.5万</b></span>
+        </div>
+      </div>
+    </section>
+
+    <!-- Tab Bar -->
+    <nav class="tab-bar">
+      <button class="tab-btn active" data-tab="energy">节能分析</button>
+      <button class="tab-btn" data-tab="water">水质优化</button>
+      <button class="tab-btn" data-tab="carbon">碳排管理</button>
+    </nav>
+
+    <!-- ═══ Tab 1: 节能分析 ═══ -->
+    <section class="tab-panel active" id="panel-energy">
+      <div class="tower-switch-bar">
+        <div class="tower-switch" id="energy-tower-switch">
+          <button class="switch-btn active" data-tower="0">塔组 #1</button>
+          <button class="switch-btn" data-tower="1">塔组 #2</button>
+          <button class="switch-btn" data-tower="2">塔组 #3</button>
+        </div>
+        <span class="tower-compare-label">当前对比：<span id="tower-compare-text">塔组 #1</span></span>
+        <button type="button" class="btn-clear" id="tower-clear-btn">清除选择</button>
+      </div>
+
+      <div class="panel-row">
+        <div class="panel">
+          <div class="panel__title">COP 24小时趋势对比</div>
+          <div class="chart-wrap"><canvas id="chart-cop"></canvas></div>
+        </div>
+        <div class="panel status-panel" id="energy-status-panel">
+          <div class="panel__title">实时状态</div>
+          <div class="status-panel__hint">请选择单个塔组查看详情</div>
+          <div class="status-panel__detail">
+            <div class="status-panel__header">
+              <span class="status-panel__tower-name" id="energy-tower-label">塔组 #1</span>
+              <span class="compare-card__badge badge--best">运行中</span>
+            </div>
+            <div class="status-panel__hero">
+              <div class="status-panel__hero-item">
+                <div class="status-panel__hero-label">当前 COP</div>
+                <div class="status-panel__hero-value" id="s-cop">5.38</div>
+              </div>
+              <div class="status-panel__hero-item">
+                <div class="status-panel__hero-label">节能率</div>
+                <div class="status-panel__hero-value" id="s-saving">19.2%</div>
+              </div>
+            </div>
+            <div class="metric"><span class="metric__label">进水温度</span><span class="metric__value" id="s-inlet">32.4°C</span></div>
+            <div class="metric"><span class="metric__label">出水温度</span><span class="metric__value" id="s-outlet">27.1°C</span></div>
+            <div class="metric"><span class="metric__label">温差 ΔT</span><span class="metric__value" id="s-delta">5.3°C</span></div>
+            <div class="metric"><span class="metric__label">循环流量</span><span class="metric__value" id="s-flow">186 m³/h</span></div>
+            <div class="metric"><span class="metric__label">输入功率</span><span class="metric__value" id="s-power">42.6 kW</span></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="compare-section__title">三塔快速对比</div>
+      <div class="compare-row">
+        <div class="compare-card">
+          <div class="compare-card__header">
+            <span class="compare-card__tower">塔组 #1</span>
+            <span class="compare-card__badge badge--best">最优</span>
+          </div>
+          <div class="compare-card__cop">COP 5.32</div>
+          <div class="compare-card__stats">
+            <span>节能率 <b>19.2%</b></span>
+            <span>功率 <b>40.5kW</b></span>
+          </div>
+        </div>
+        <div class="compare-card">
+          <div class="compare-card__header">
+            <span class="compare-card__tower">塔组 #2</span>
+            <span class="compare-card__badge badge--good">良好</span>
+          </div>
+          <div class="compare-card__cop">COP 5.28</div>
+          <div class="compare-card__stats">
+            <span>节能率 <b>18.8%</b></span>
+            <span>功率 <b>41.2kW</b></span>
+          </div>
+        </div>
+        <div class="compare-card">
+          <div class="compare-card__header">
+            <span class="compare-card__tower">塔组 #3</span>
+            <span class="compare-card__badge badge--normal">正常</span>
+          </div>
+          <div class="compare-card__cop">COP 5.12</div>
+          <div class="compare-card__stats">
+            <span>节能率 <b>17.9%</b></span>
+            <span>功率 <b>42.8kW</b></span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ═══ Tab 2: 水质优化 ═══ -->
+    <section class="tab-panel" id="panel-water">
+      <div class="point-switch">
+        <button class="switch-btn active" data-point="0">监测点 #1</button>
+        <button class="switch-btn" data-point="1">监测点 #2</button>
+        <button class="switch-btn" data-point="2">监测点 #3</button>
+      </div>
+
+      <div class="panel-row">
+        <div class="panel">
+          <div class="panel__title">pH / LSI 指数趋势 · <span id="water-point-label">监测点 #1</span></div>
+          <div class="chart-wrap"><canvas id="chart-water"></canvas></div>
+        </div>
+        <div class="panel water-metrics status-panel">
+          <div class="panel__title">水质参数</div>
+          <div class="metric"><span class="metric__label">LSI 指数</span><span class="metric__value" id="w-lsi">0.32</span></div>
+          <div class="metric"><span class="metric__label">浓缩倍数</span><span class="metric__value" id="w-cycle">4.2</span></div>
+          <div class="metric"><span class="metric__label">pH</span><span class="metric__value" id="w-ph">8.12</span></div>
+          <div class="metric"><span class="metric__label">电导率</span><span class="metric__value" id="w-cond">1850 μS/cm</span></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ═══ Tab 3: 碳排管理 ═══ -->
+    <section class="tab-panel" id="panel-carbon">
+      <div class="tower-switch" id="carbon-tower-switch">
+        <button class="switch-btn active" data-carbon-tower="0">塔组 #1</button>
+        <button class="switch-btn" data-carbon-tower="1">塔组 #2</button>
+        <button class="switch-btn" data-carbon-tower="2">塔组 #3</button>
+      </div>
+
+      <div class="panel-row">
+        <div class="panel">
+          <div class="panel__title">月减排量 · <span id="carbon-tower-label">塔组 #1</span></div>
+          <div class="chart-wrap"><canvas id="chart-carbon"></canvas></div>
+        </div>
+        <div class="panel carbon-right">
+          <div class="progress-ring">
+            <svg width="160" height="160" viewBox="0 0 160 160">
+              <circle cx="80" cy="80" r="68" fill="none" stroke="#1a4060" stroke-width="10"/>
+              <circle id="progress-arc" cx="80" cy="80" r="68" fill="none"
+                stroke="#4df0b4" stroke-width="10" stroke-linecap="round"
+                stroke-dasharray="427.26" stroke-dashoffset="93.99"/>
+            </svg>
+            <div class="progress-ring__label">
+              <span class="progress-ring__pct">78%</span>
+              <span class="progress-ring__text">年度目标完成</span>
+            </div>
+          </div>
+          <div class="carbon-stats">
+            <div>
+              <div class="carbon-stat__value" id="carbon-month">164t</div>
+              <div class="carbon-stat__label">本月减排</div>
+            </div>
+            <div>
+              <div class="carbon-stat__value" id="carbon-total">982t</div>
+              <div class="carbon-stat__label">累计减排</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <footer class="site-footer">
+    <span>绿色节能系统 v2.0 &nbsp;·&nbsp; 监测点: 3个冷水塔组</span>
+    <span>节能降碳 &nbsp;绿色发展</span>
+  </footer>
+
+  <script>
+    /* ── Clock ── */
+    function updateClock() {
+      const now = new Date();
+      const pad = n => String(n).padStart(2, '0');
+      document.getElementById('clock').textContent =
+        `${now.getFullYear()}-${pad(now.getMonth()+1)}-${pad(now.getDate())} ` +
+        `${pad(now.getHours())}:${pad(now.getMinutes())}:${pad(now.getSeconds())}`;
+    }
+    updateClock();
+    setInterval(updateClock, 1000);
+
+    /* ── Chart defaults ── */
+    Chart.defaults.color = '#5a8aaa';
+    Chart.defaults.borderColor = 'rgba(30,80,120,0.3)';
+    Chart.defaults.backgroundColor = 'transparent';
+
+    const chartDefaults = {
+      responsive: true,
+      maintainAspectRatio: false,
+      plugins: {
+        legend: { labels: { color: '#5a8aaa', font: { family: 'Courier New' } } },
+        tooltip: {
+          backgroundColor: '#0d2d4a',
+          titleColor: '#4df0b4',
+          bodyColor: '#c8e6f5',
+          borderColor: '#1a4060',
+          borderWidth: 1
+        }
+      },
+      scales: {
+        x: {
+          ticks: { color: '#5a8aaa', font: { family: 'Courier New', size: 10 } },
+          grid: { color: 'rgba(30,80,120,0.3)' }
+        },
+        y: {
+          ticks: { color: '#5a8aaa', font: { family: 'Courier New', size: 10 } },
+          grid: { color: 'rgba(30,80,120,0.3)' }
+        }
+      }
+    };
+
+    const hours = Array.from({ length: 24 }, (_, i) => `${String(i).padStart(2,'0')}:00`);
+    const months = ['1月','2月','3月','4月','5月','6月','7月','8月','9月','10月','11月','12月'];
+    const RING_CIRC = 427.26;
+    const carbonPct = [78, 75, 74];
+    const copBases = [5.38, 5.21, 5.13];
+
+    function genWave(base, amp, len) {
+      return Array.from({ length: len }, (_, i) =>
+        +(base + amp * Math.sin(i * 0.5) + (Math.random() - 0.5) * amp * 0.4).toFixed(2)
+      );
+    }
+
+    const copChartData = copBases.map(b => genWave(b, 0.3, 24));
+
+    const waterBases = [{ ph: 8.12, lsi: 0.32 }, { ph: 8.05, lsi: 0.28 }, { ph: 8.18, lsi: 0.41 }];
+    const waterChartData = waterBases.map(b => ({
+      ph: genWave(b.ph, 0.15, 24),
+      lsi: genWave(b.lsi, 0.12, 24)
+    }));
+
+    /* ── Tower data ── */
+    const towerData = [
+      { cop: '5.38', saving: '19.2%', inlet: '32.4°C', outlet: '27.1°C', deltaT: '5.3°C', flow: '186 m³/h', power: '42.6 kW' },
+      { cop: '5.21', saving: '18.1%', inlet: '33.1°C', outlet: '27.8°C', deltaT: '5.3°C', flow: '172 m³/h', power: '45.2 kW' },
+      { cop: '5.13', saving: '18.5%', inlet: '32.8°C', outlet: '28.0°C', deltaT: '4.8°C', flow: '165 m³/h', power: '46.8 kW' }
+    ];
+
+    const waterData = [
+      { lsi: '0.32', cycle: '4.2', ph: '8.12', cond: '1850 μS/cm' },
+      { lsi: '0.28', cycle: '3.9', ph: '8.05', cond: '1720 μS/cm' },
+      { lsi: '0.41', cycle: '4.5', ph: '8.18', cond: '1980 μS/cm' }
+    ];
+
+    const carbonData = [
+      { month: '164t', total: '982t', monthly: [72,85,90,78,95,102,88,110,98,105,92,164] },
+      { month: '158t', total: '945t', monthly: [68,80,88,75,90,98,85,105,95,100,88,158] },
+      { month: '152t', total: '929t', monthly: [65,78,85,72,88,95,82,100,92,98,85,152] }
+    ];
+
+    const towerColors = ['#4df0b4', '#5ab8e8', '#8a7ad8'];
+    const towerColorsDim = ['rgba(77,240,180,0.25)', 'rgba(90,184,232,0.25)', 'rgba(138,122,216,0.25)'];
+
+    let charts = { cop: null, water: null, carbon: null };
+    let selectedTowers = new Set([0]);
+    let activePoint = 0;
+    let activeCarbonTower = 0;
+    const initialized = { energy: false, water: false, carbon: false };
+
+    /* ── COP Chart ── */
+    function initCopChart() {
+      const ctx = document.getElementById('chart-cop').getContext('2d');
+      charts.cop = new Chart(ctx, {
+        type: 'line',
+        data: {
+          labels: hours,
+          datasets: [0,1,2].map(i => ({
+            label: `塔组 #${i+1}`,
+            data: copChartData[i],
+            borderColor: towerColors[i],
+            backgroundColor: 'transparent',
+            borderWidth: 2,
+            pointRadius: 0,
+            tension: 0.4,
+            hidden: i !== 0
+          }))
+        },
+        options: {
+          ...chartDefaults,
+          plugins: {
+            ...chartDefaults.plugins,
+            legend: { display: true, labels: { color: '#5a8aaa', font: { family: 'Courier New' } } }
+          },
+          scales: {
+            ...chartDefaults.scales,
+            y: { ...chartDefaults.scales.y, title: { display: true, text: 'COP', color: '#5a8aaa' } }
+          }
+        }
+      });
+    }
+
+    function getSelectedTowersSorted() {
+      return [...selectedTowers].sort((a, b) => a - b);
+    }
+
+    function updateCompareLabel() {
+      const names = getSelectedTowersSorted().map(i => `塔组 #${i + 1}`);
+      document.getElementById('tower-compare-text').textContent = names.join('、');
+    }
+
+    function syncTowerButtons() {
+      document.querySelectorAll('#energy-tower-switch .switch-btn').forEach(btn => {
+        btn.classList.toggle('active', selectedTowers.has(+btn.dataset.tower));
+      });
+    }
+
+    function applyCopChartVisibility() {
+      if (!charts.cop) return;
+      charts.cop.data.datasets.forEach((ds, i) => {
+        ds.hidden = !selectedTowers.has(i);
+        ds.borderColor = towerColors[i];
+        ds.borderWidth = 2;
+      });
+      charts.cop.update();
+    }
+
+    function fillEnergyDetail(idx) {
+      const d = towerData[idx];
+      document.getElementById('energy-tower-label').textContent = `塔组 #${idx + 1}`;
+      document.getElementById('s-cop').textContent = d.cop;
+      document.getElementById('s-saving').textContent = d.saving;
+      document.getElementById('s-inlet').textContent = d.inlet;
+      document.getElementById('s-outlet').textContent = d.outlet;
+      document.getElementById('s-delta').textContent = d.deltaT;
+      document.getElementById('s-flow').textContent = d.flow;
+      document.getElementById('s-power').textContent = d.power;
+    }
+
+    function syncEnergyTowerUI() {
+      syncTowerButtons();
+      updateCompareLabel();
+      applyCopChartVisibility();
+      const panel = document.getElementById('energy-status-panel');
+      if (selectedTowers.size === 1) {
+        panel.classList.remove('status-panel--multi');
+        fillEnergyDetail(getSelectedTowersSorted()[0]);
+      } else {
+        panel.classList.add('status-panel--multi');
+      }
+    }
+
+    function toggleTower(idx) {
+      if (selectedTowers.has(idx)) {
+        if (selectedTowers.size > 1) selectedTowers.delete(idx);
+      } else {
+        selectedTowers.add(idx);
+      }
+      syncEnergyTowerUI();
+    }
+
+    function clearTowerSelection() {
+      selectedTowers.clear();
+      selectedTowers.add(0);
+      syncEnergyTowerUI();
+    }
+
+    /* ── Water Chart ── */
+    function initWaterChart() {
+      const ctx = document.getElementById('chart-water').getContext('2d');
+      const initial = waterChartData[activePoint];
+      charts.water = new Chart(ctx, {
+        type: 'line',
+        data: {
+          labels: Array.from({ length: 24 }, (_, i) => `${i}h`),
+          datasets: [
+            {
+              label: 'pH',
+              data: initial.ph,
+              borderColor: '#4df0b4',
+              backgroundColor: 'transparent',
+              borderWidth: 2,
+              pointRadius: 0,
+              tension: 0.4,
+              yAxisID: 'y'
+            },
+            {
+              label: 'LSI 指数',
+              data: initial.lsi,
+              borderColor: '#5ab8e8',
+              backgroundColor: 'transparent',
+              borderWidth: 2,
+              pointRadius: 0,
+              tension: 0.4,
+              yAxisID: 'y1'
+            }
+          ]
+        },
+        options: {
+          ...chartDefaults,
+          scales: {
+            x: chartDefaults.scales.x,
+            y: {
+              position: 'left',
+              ticks: { color: '#4df0b4', font: { family: 'Courier New', size: 10 } },
+              grid: { color: 'rgba(30,80,120,0.3)' },
+              title: { display: true, text: 'pH', color: '#4df0b4' }
+            },
+            y1: {
+              position: 'right',
+              ticks: { color: '#5ab8e8', font: { family: 'Courier New', size: 10 } },
+              grid: { drawOnChartArea: false },
+              title: { display: true, text: 'LSI', color: '#5ab8e8' }
+            }
+          }
+        }
+      });
+    }
+
+    function refreshWaterChart(point) {
+      if (!charts.water) return;
+      const d = waterChartData[point];
+      charts.water.data.datasets[0].data = d.ph;
+      charts.water.data.datasets[1].data = d.lsi;
+      charts.water.update();
+    }
+
+    /* ── Carbon Chart ── */
+    function initCarbonChart() {
+      const ctx = document.getElementById('chart-carbon').getContext('2d');
+      charts.carbon = new Chart(ctx, {
+        type: 'bar',
+        data: {
+          labels: months,
+          datasets: [{
+            label: '月减排量 (t)',
+            data: carbonData[0].monthly,
+            backgroundColor: months.map((_, i) =>
+              i === 11 ? 'rgba(77,240,180,0.85)' : 'rgba(77,240,180,0.35)'
+            ),
+            borderColor: '#4df0b4',
+            borderWidth: 1,
+            borderRadius: 3
+          }]
+        },
+        options: {
+          ...chartDefaults,
+          scales: {
+            ...chartDefaults.scales,
+            y: { ...chartDefaults.scales.y, title: { display: true, text: 'tCO₂', color: '#5a8aaa' } }
+          }
+        }
+      });
+    }
+
+    function refreshCarbonChart(tower) {
+      if (!charts.carbon) return;
+      const d = carbonData[tower].monthly;
+      charts.carbon.data.datasets[0].data = d;
+      charts.carbon.data.datasets[0].backgroundColor = months.map((_, i) =>
+        i === 11 ? 'rgba(77,240,180,0.85)' : 'rgba(77,240,180,0.35)'
+      );
+      charts.carbon.update();
+    }
+
+    function updateWaterPanel(idx) {
+      const d = waterData[idx];
+      document.getElementById('water-point-label').textContent = `监测点 #${idx + 1}`;
+      document.getElementById('w-lsi').textContent = d.lsi;
+      document.getElementById('w-cycle').textContent = d.cycle;
+      document.getElementById('w-ph').textContent = d.ph;
+      document.getElementById('w-cond').textContent = d.cond;
+      refreshWaterChart(idx);
+    }
+
+    function updateCarbonPanel(idx) {
+      const d = carbonData[idx];
+      const pct = carbonPct[idx];
+      document.getElementById('carbon-tower-label').textContent = `塔组 #${idx + 1}`;
+      document.getElementById('carbon-month').textContent = d.month;
+      document.getElementById('carbon-total').textContent = d.total;
+      document.getElementById('progress-arc').style.strokeDashoffset = RING_CIRC * (1 - pct / 100);
+      document.querySelector('.progress-ring__pct').textContent = pct + '%';
+      refreshCarbonChart(idx);
+    }
+
+    /* ── Stat card count-up ── */
+    function countUp(elementId, targetValue, decimals, duration = 1200, suffix = '') {
+      const el = document.getElementById(elementId);
+      if (!el) return;
+      const start = performance.now();
+      function tick(now) {
+        const t = Math.min((now - start) / duration, 1);
+        const eased = 1 - Math.pow(1 - t, 3);
+        const current = targetValue * eased;
+        el.textContent = current.toFixed(decimals) + suffix;
+        if (t < 1) requestAnimationFrame(tick);
+        else el.textContent = targetValue.toFixed(decimals) + suffix;
+      }
+      requestAnimationFrame(tick);
+    }
+
+    /* ── COP live scroll ── */
+    function tickCopChart() {
+      if (!charts.cop) return;
+      const lastLabel = hours[hours.length - 1];
+      const h = parseInt(lastLabel, 10);
+      hours.shift();
+      hours.push(`${String((h + 1) % 24).padStart(2, '0')}:00`);
+      charts.cop.data.datasets.forEach((ds, i) => {
+        ds.data.shift();
+        ds.data.push(+(copBases[i] + (Math.random() - 0.5) * 0.3).toFixed(2));
+      });
+      charts.cop.update('none');
+    }
+
+    /* ── Tab switching ── */
+    document.querySelectorAll('.tab-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+        document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
+        btn.classList.add('active');
+        const tab = btn.dataset.tab;
+        document.getElementById(`panel-${tab}`).classList.add('active');
+
+        if (tab === 'energy' && !initialized.energy) {
+          initCopChart();
+          syncEnergyTowerUI();
+          initialized.energy = true;
+        } else if (tab === 'water' && !initialized.water) {
+          initWaterChart();
+          initialized.water = true;
+        } else if (tab === 'carbon' && !initialized.carbon) {
+          initCarbonChart();
+          initialized.carbon = true;
+        }
+      });
+    });
+
+    /* ── Tower multi-select (energy) ── */
+    document.getElementById('energy-tower-switch').addEventListener('click', e => {
+      const btn = e.target.closest('.switch-btn');
+      if (!btn) return;
+      toggleTower(+btn.dataset.tower);
+    });
+
+    document.getElementById('tower-clear-btn').addEventListener('click', clearTowerSelection);
+
+    /* ── Point switch (water) ── */
+    document.querySelector('#panel-water .point-switch').addEventListener('click', e => {
+      const btn = e.target.closest('.switch-btn');
+      if (!btn) return;
+      document.querySelectorAll('#panel-water .switch-btn').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      activePoint = +btn.dataset.point;
+      updateWaterPanel(activePoint);
+    });
+
+    /* ── Tower switch (carbon) ── */
+    document.getElementById('carbon-tower-switch').addEventListener('click', e => {
+      const btn = e.target.closest('.switch-btn');
+      if (!btn) return;
+      document.querySelectorAll('#carbon-tower-switch .switch-btn').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      activeCarbonTower = +btn.dataset.carbonTower;
+      updateCarbonPanel(activeCarbonTower);
+    });
+
+    /* ── Init first tab chart on load ── */
+    window.addEventListener('DOMContentLoaded', () => {
+      countUp('stat-saving', 18.6, 1, 1200, '%');
+      countUp('stat-carbon', 2856, 0, 1200, ' tCO₂');
+      countUp('stat-cop', 5.24, 2);
+      countUp('stat-cost', 486.5, 1, 1200, '万元');
+
+      initCopChart();
+      syncEnergyTowerUI();
+      initialized.energy = true;
+
+      setInterval(tickCopChart, 3000);
+    });
+  </script>
+</body>
+</html>
