@@ -280,6 +280,13 @@
     .chart-wrap {
       position: relative;
       height: 280px;
+      cursor: pointer;
+    }
+
+    .chart-hint {
+      font-size: 11px;
+      color: var(--text-dim);
+      margin: -8px 0 12px;
     }
 
     /* ── Status Panel ── */
@@ -626,20 +633,10 @@
 
     <!-- ═══ Tab 2: 水质监测 ═══ -->
     <section class="tab-panel" id="panel-water">
-      <div class="point-switch">
-        <button class="switch-btn active" data-point="0">第1月</button>
-        <button class="switch-btn" data-point="1">第2月</button>
-        <button class="switch-btn" data-point="2">第3月</button>
-        <button class="switch-btn" data-point="3">第4月</button>
-        <button class="switch-btn" data-point="4">第5月</button>
-        <button class="switch-btn" data-point="5">第6月</button>
-        <button class="switch-btn" data-point="6">第7月(换水)</button>
-        <button class="switch-btn" data-point="7">第8月</button>
-      </div>
-
       <div class="panel-row">
         <div class="panel">
-          <div class="panel__title">pH / 电导率月度趋势（含原水基准）</div>
+          <div class="panel__title">pH / 电导率月度趋势</div>
+          <p class="chart-hint">点击图表上的数据点，查看对应月份水质参数</p>
           <div class="chart-wrap"><canvas id="chart-water"></canvas></div>
         </div>
         <div class="panel water-metrics status-panel">
@@ -756,8 +753,9 @@
       { name: '对照组', kwh: '93.9万', scale: '1.2 mm', inlet: '25.7°C', outlet: '21.4°C', deltaT: '4.3°C', flow: '500 m³/h', power: '20 kW' }
     ];
 
-    /* 各月水质监测结果（与评估报告表一致，索引 0=第1月 … 7=第8月） */
+    /* 水质监测结果（与评估报告表一致，索引与图表横轴一一对应） */
     const waterData = [
+      { label: '原水', ph: '7.88', tds: '90 ppm', ca: '26 mg/L', mg: '72 mg/L', cond: '185 μS/cm', turb: '1.97 NTU', hard: '96 mg/L', alk: '104 mg/L', cycle: '1.0' },
       { label: '第1月', ph: '7.93', tds: '178 ppm', ca: '51 mg/L', mg: '142 mg/L', cond: '365 μS/cm', turb: '2.35 NTU', hard: '190 mg/L', alk: '206 mg/L', cycle: '1.6' },
       { label: '第2月', ph: '8.18', tds: '307 ppm', ca: '88 mg/L', mg: '244 mg/L', cond: '630 μS/cm', turb: '3.12 NTU', hard: '328 mg/L', alk: '356 mg/L', cycle: '2.8' },
       { label: '第3月', ph: '8.42', tds: '704 ppm', ca: '150 mg/L', mg: '416 mg/L', cond: '1444 μS/cm', turb: '3.63 NTU', hard: '808 mg/L', alk: '352 mg/L', cycle: '4.0' },
@@ -772,8 +770,37 @@
 
     let charts = { cop: null, water: null, carbon: null };
     let selectedTowers = new Set([0]);
-    let activePoint = 0;
+    let activeWaterIdx = 1;
     const initialized = { energy: false, water: false, carbon: false };
+
+    function waterPointStyle(idx, color) {
+      const n = waterMonths.length;
+      return {
+        pointRadius: Array.from({ length: n }, (_, i) => i === idx ? 8 : 5),
+        pointHoverRadius: 9,
+        pointBackgroundColor: Array.from({ length: n }, (_, i) => i === idx ? color : color + '99'),
+        pointBorderColor: Array.from({ length: n }, (_, i) => i === idx ? '#fff' : color),
+        pointBorderWidth: Array.from({ length: n }, (_, i) => i === idx ? 2 : 1)
+      };
+    }
+
+    function highlightWaterPoint(idx) {
+      if (!charts.water) return;
+      activeWaterIdx = idx;
+      const phStyle = waterPointStyle(idx, '#4df0b4');
+      const condStyle = waterPointStyle(idx, '#5ab8e8');
+      const ds0 = charts.water.data.datasets[0];
+      const ds1 = charts.water.data.datasets[1];
+      Object.assign(ds0, phStyle);
+      Object.assign(ds1, condStyle);
+      charts.water.update();
+    }
+
+    function selectWaterMonth(idx) {
+      if (idx < 0 || idx >= waterData.length) return;
+      highlightWaterPoint(idx);
+      updateWaterPanel(idx);
+    }
 
     /* ── 月耗电量对比图 ── */
     function initCopChart() {
@@ -891,9 +918,11 @@
       syncEnergyTowerUI();
     }
 
-    /* ── 水质月度趋势图 ── */
+    /* ── 水质月度趋势图（点击数据点切换右侧参数） ── */
     function initWaterChart() {
       const ctx = document.getElementById('chart-water').getContext('2d');
+      const phInit = waterPointStyle(activeWaterIdx, '#4df0b4');
+      const condInit = waterPointStyle(activeWaterIdx, '#5ab8e8');
       charts.water = new Chart(ctx, {
         type: 'line',
         data: {
@@ -905,9 +934,9 @@
               borderColor: '#4df0b4',
               backgroundColor: 'transparent',
               borderWidth: 2,
-              pointRadius: 3,
               tension: 0.3,
-              yAxisID: 'y'
+              yAxisID: 'y',
+              ...phInit
             },
             {
               label: '电导率 (μS/cm)',
@@ -915,14 +944,18 @@
               borderColor: '#5ab8e8',
               backgroundColor: 'transparent',
               borderWidth: 2,
-              pointRadius: 3,
               tension: 0.3,
-              yAxisID: 'y1'
+              yAxisID: 'y1',
+              ...condInit
             }
           ]
         },
         options: {
           ...chartDefaults,
+          interaction: { mode: 'index', intersect: false },
+          onClick: (_evt, elements) => {
+            if (elements.length) selectWaterMonth(elements[0].index);
+          },
           scales: {
             x: chartDefaults.scales.x,
             y: {
@@ -940,6 +973,7 @@
           }
         }
       });
+      selectWaterMonth(activeWaterIdx);
     }
 
     /* ── 月度节电量柱状图 ── */
@@ -1015,7 +1049,6 @@
           initialized.energy = true;
         } else if (tab === 'water' && !initialized.water) {
           initWaterChart();
-          updateWaterPanel(activePoint);
           initialized.water = true;
         } else if (tab === 'carbon' && !initialized.carbon) {
           initCarbonChart();
@@ -1032,16 +1065,6 @@
     });
 
     document.getElementById('tower-clear-btn').addEventListener('click', clearTowerSelection);
-
-    /* ── Point switch (water) ── */
-    document.querySelector('#panel-water .point-switch').addEventListener('click', e => {
-      const btn = e.target.closest('.switch-btn');
-      if (!btn) return;
-      document.querySelectorAll('#panel-water .switch-btn').forEach(b => b.classList.remove('active'));
-      btn.classList.add('active');
-      activePoint = +btn.dataset.point;
-      updateWaterPanel(activePoint);
-    });
 
     /* ── Init first tab chart on load ── */
     window.addEventListener('DOMContentLoaded', () => {
