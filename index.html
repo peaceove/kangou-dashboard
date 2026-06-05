@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>节能增效智慧监管平台</title>
+  <title>抗垢卫士智慧监管平台 · 国网长乐路</title>
   <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
@@ -354,6 +354,10 @@
       gap: 16px;
     }
 
+    .compare-row--2 {
+      grid-template-columns: repeat(2, 1fr);
+    }
+
     .compare-card {
       background: var(--bg-card);
       border: 1px solid var(--border);
@@ -489,13 +493,13 @@
   <!-- Header -->
   <header class="header">
     <div>
-      <h1 class="header__title">节能增效智慧监管平台</h1>
-      <p class="header__subtitle">冷水塔组 #1 #2 #3 实时监测</p>
+      <h1 class="header__title">抗垢卫士智慧监管平台</h1>
+      <p class="header__subtitle">国网长乐路办公区 · 中央空调冷却水系统</p>
     </div>
     <div class="header__right">
       <div class="status-badge">
         <span class="status-dot"></span>
-        <span>3个检测点在线</span>
+        <span>2组监测在线</span>
       </div>
       <div class="clock" id="clock">--</div>
       <div class="header__logo-wrap">
@@ -509,166 +513,145 @@
     <!-- Stat Cards -->
     <section class="stat-row">
       <div class="stat-card">
-        <div class="stat-card__label">综合节能率</div>
+        <div class="stat-card__label">6个月节电率</div>
         <div class="stat-card__value" id="stat-saving">0%</div>
         <div class="stat-card__towers">
-          <span>#1 <b>19.2%</b></span>
-          <span>#2 <b>18.1%</b></span>
-          <span>#3 <b>18.5%</b></span>
+          <span>样板 <b>6.35%</b></span>
+          <span>对照 <b>基准</b></span>
         </div>
       </div>
       <div class="stat-card">
-        <div class="stat-card__label">累计碳减排</div>
-        <div class="stat-card__value" id="stat-carbon">0 tCO₂</div>
+        <div class="stat-card__label">累计节电量</div>
+        <div class="stat-card__value" id="stat-kwh">0 kWh</div>
         <div class="stat-card__towers">
-          <span>#1 <b>982t</b></span>
-          <span>#2 <b>945t</b></span>
-          <span>#3 <b>929t</b></span>
+          <span>样板 <b>550.6万</b></span>
+          <span>对照 <b>587.9万</b></span>
         </div>
       </div>
       <div class="stat-card">
-        <div class="stat-card__label">平均能效比 COP</div>
-        <div class="stat-card__value" id="stat-cop">0.00</div>
+        <div class="stat-card__label">垢层厚度（第6月）</div>
+        <div class="stat-card__value" id="stat-scale">0 mm</div>
         <div class="stat-card__towers">
-          <span>#1 <b>5.38</b></span>
-          <span>#2 <b>5.21</b></span>
-          <span>#3 <b>5.13</b></span>
+          <span>样板 <b>0 mm</b></span>
+          <span>对照 <b>1.2 mm</b></span>
         </div>
       </div>
       <div class="stat-card">
-        <div class="stat-card__label">累计节约成本</div>
+        <div class="stat-card__label">累计节约电费</div>
         <div class="stat-card__value" id="stat-cost">0.0万元</div>
         <div class="stat-card__towers">
-          <span>#1 <b>168.2万</b></span>
-          <span>#2 <b>159.8万</b></span>
-          <span>#3 <b>158.5万</b></span>
+          <span>ROI <b>5.7%</b></span>
+          <span>回收 <b>约6月</b></span>
         </div>
       </div>
     </section>
 
     <!-- Tab Bar -->
     <nav class="tab-bar">
-      <button class="tab-btn active" data-tab="energy">节能分析</button>
-      <button class="tab-btn" data-tab="water">水质优化</button>
-      <button class="tab-btn" data-tab="carbon">碳排管理</button>
+      <button class="tab-btn active" data-tab="energy">运行效能</button>
+      <button class="tab-btn" data-tab="water">水质监测</button>
+      <button class="tab-btn" data-tab="carbon">经济效益</button>
     </nav>
 
-    <!-- ═══ Tab 1: 节能分析 ═══ -->
+    <!-- ═══ Tab 1: 运行效能 ═══ -->
     <section class="tab-panel active" id="panel-energy">
       <div class="tower-switch-bar">
         <div class="tower-switch" id="energy-tower-switch">
-          <button class="switch-btn active" data-tower="0">塔组 #1</button>
-          <button class="switch-btn" data-tower="1">塔组 #2</button>
-          <button class="switch-btn" data-tower="2">塔组 #3</button>
+          <button class="switch-btn active" data-tower="0">样板组</button>
+          <button class="switch-btn" data-tower="1">对照组</button>
         </div>
-        <span class="tower-compare-label">当前对比：<span id="tower-compare-text">塔组 #1</span></span>
+        <span class="tower-compare-label">当前对比：<span id="tower-compare-text">样板组</span></span>
         <button type="button" class="btn-clear" id="tower-clear-btn">清除选择</button>
       </div>
 
       <div class="panel-row">
         <div class="panel">
-          <div class="panel__title">COP 24小时趋势对比</div>
+          <div class="panel__title">月耗电量对比（2025年4–9月）</div>
           <div class="chart-wrap"><canvas id="chart-cop"></canvas></div>
         </div>
         <div class="panel status-panel" id="energy-status-panel">
-          <div class="panel__title">实时状态</div>
-          <div class="status-panel__hint">请选择单个塔组查看详情</div>
+          <div class="panel__title">运行状态 · 2025年9月</div>
+          <div class="status-panel__hint">请选择单个组别查看详情</div>
           <div class="status-panel__detail">
             <div class="status-panel__header">
-              <span class="status-panel__tower-name" id="energy-tower-label">塔组 #1</span>
+              <span class="status-panel__tower-name" id="energy-tower-label">样板组</span>
               <span class="compare-card__badge badge--best">运行中</span>
             </div>
             <div class="status-panel__hero">
               <div class="status-panel__hero-item">
-                <div class="status-panel__hero-label">当前 COP</div>
-                <div class="status-panel__hero-value" id="s-cop">5.38</div>
+                <div class="status-panel__hero-label">月耗电量</div>
+                <div class="status-panel__hero-value" id="s-kwh">85.9万</div>
               </div>
               <div class="status-panel__hero-item">
-                <div class="status-panel__hero-label">节能率</div>
-                <div class="status-panel__hero-value" id="s-saving">19.2%</div>
+                <div class="status-panel__hero-label">垢层厚度</div>
+                <div class="status-panel__hero-value" id="s-scale">0 mm</div>
               </div>
             </div>
-            <div class="metric"><span class="metric__label">进水温度</span><span class="metric__value" id="s-inlet">32.4°C</span></div>
-            <div class="metric"><span class="metric__label">出水温度</span><span class="metric__value" id="s-outlet">27.1°C</span></div>
-            <div class="metric"><span class="metric__label">温差 ΔT</span><span class="metric__value" id="s-delta">5.3°C</span></div>
-            <div class="metric"><span class="metric__label">循环流量</span><span class="metric__value" id="s-flow">186 m³/h</span></div>
-            <div class="metric"><span class="metric__label">输入功率</span><span class="metric__value" id="s-power">42.6 kW</span></div>
+            <div class="metric"><span class="metric__label">进水温度</span><span class="metric__value" id="s-inlet">25.7°C</span></div>
+            <div class="metric"><span class="metric__label">出水温度</span><span class="metric__value" id="s-outlet">20.7°C</span></div>
+            <div class="metric"><span class="metric__label">温差 ΔT</span><span class="metric__value" id="s-delta">5.0°C</span></div>
+            <div class="metric"><span class="metric__label">循环流量</span><span class="metric__value" id="s-flow">500 m³/h</span></div>
+            <div class="metric"><span class="metric__label">风机功率</span><span class="metric__value" id="s-power">20 kW</span></div>
           </div>
         </div>
       </div>
 
-      <div class="compare-section__title">三塔快速对比</div>
-      <div class="compare-row">
+      <div class="compare-section__title">样板组 vs 对照组（第6月）</div>
+      <div class="compare-row compare-row--2">
         <div class="compare-card">
           <div class="compare-card__header">
-            <span class="compare-card__tower">塔组 #1</span>
+            <span class="compare-card__tower">样板组（抗垢卫士）</span>
             <span class="compare-card__badge badge--best">最优</span>
           </div>
-          <div class="compare-card__cop">COP 5.32</div>
+          <div class="compare-card__cop">垢厚 0 mm</div>
           <div class="compare-card__stats">
-            <span>节能率 <b>19.2%</b></span>
-            <span>功率 <b>40.5kW</b></span>
+            <span>9月电耗 <b>85.92万kWh</b></span>
+            <span>温差 <b>5.0°C</b></span>
           </div>
         </div>
         <div class="compare-card">
           <div class="compare-card__header">
-            <span class="compare-card__tower">塔组 #2</span>
-            <span class="compare-card__badge badge--good">良好</span>
+            <span class="compare-card__tower">对照组（未处理）</span>
+            <span class="compare-card__badge badge--normal">对照</span>
           </div>
-          <div class="compare-card__cop">COP 5.28</div>
+          <div class="compare-card__cop">垢厚 1.2 mm</div>
           <div class="compare-card__stats">
-            <span>节能率 <b>18.8%</b></span>
-            <span>功率 <b>41.2kW</b></span>
-          </div>
-        </div>
-        <div class="compare-card">
-          <div class="compare-card__header">
-            <span class="compare-card__tower">塔组 #3</span>
-            <span class="compare-card__badge badge--normal">正常</span>
-          </div>
-          <div class="compare-card__cop">COP 5.12</div>
-          <div class="compare-card__stats">
-            <span>节能率 <b>17.9%</b></span>
-            <span>功率 <b>42.8kW</b></span>
+            <span>9月电耗 <b>93.87万kWh</b></span>
+            <span>温差 <b>4.3°C</b></span>
           </div>
         </div>
       </div>
     </section>
 
-    <!-- ═══ Tab 2: 水质优化 ═══ -->
+    <!-- ═══ Tab 2: 水质监测 ═══ -->
     <section class="tab-panel" id="panel-water">
       <div class="point-switch">
-        <button class="switch-btn active" data-point="0">监测点 #1</button>
-        <button class="switch-btn" data-point="1">监测点 #2</button>
-        <button class="switch-btn" data-point="2">监测点 #3</button>
+        <button class="switch-btn active" data-point="0">原水</button>
+        <button class="switch-btn" data-point="1">第6月</button>
+        <button class="switch-btn" data-point="2">第8月</button>
       </div>
 
       <div class="panel-row">
         <div class="panel">
-          <div class="panel__title">pH / LSI 指数趋势 · <span id="water-point-label">监测点 #1</span></div>
+          <div class="panel__title">pH / 电导率月度趋势 · <span id="water-point-label">原水</span></div>
           <div class="chart-wrap"><canvas id="chart-water"></canvas></div>
         </div>
         <div class="panel water-metrics status-panel">
           <div class="panel__title">水质参数</div>
-          <div class="metric"><span class="metric__label">LSI 指数</span><span class="metric__value" id="w-lsi">0.32</span></div>
-          <div class="metric"><span class="metric__label">浓缩倍数</span><span class="metric__value" id="w-cycle">4.2</span></div>
-          <div class="metric"><span class="metric__label">pH</span><span class="metric__value" id="w-ph">8.12</span></div>
-          <div class="metric"><span class="metric__label">电导率</span><span class="metric__value" id="w-cond">1850 μS/cm</span></div>
+          <div class="metric"><span class="metric__label">钙离子 Ca²⁺</span><span class="metric__value" id="w-ca">26 mg/L</span></div>
+          <div class="metric"><span class="metric__label">浓缩倍数</span><span class="metric__value" id="w-cycle">1.0</span></div>
+          <div class="metric"><span class="metric__label">pH</span><span class="metric__value" id="w-ph">7.88</span></div>
+          <div class="metric"><span class="metric__label">电导率</span><span class="metric__value" id="w-cond">185 μS/cm</span></div>
+          <div class="metric"><span class="metric__label">TDS</span><span class="metric__value" id="w-tds">90 ppm</span></div>
         </div>
       </div>
     </section>
 
-    <!-- ═══ Tab 3: 碳排管理 ═══ -->
+    <!-- ═══ Tab 3: 经济效益 ═══ -->
     <section class="tab-panel" id="panel-carbon">
-      <div class="tower-switch" id="carbon-tower-switch">
-        <button class="switch-btn active" data-carbon-tower="0">塔组 #1</button>
-        <button class="switch-btn" data-carbon-tower="1">塔组 #2</button>
-        <button class="switch-btn" data-carbon-tower="2">塔组 #3</button>
-      </div>
-
       <div class="panel-row">
         <div class="panel">
-          <div class="panel__title">月减排量 · <span id="carbon-tower-label">塔组 #1</span></div>
+          <div class="panel__title">月度节电量（对照组 − 样板组）</div>
           <div class="chart-wrap"><canvas id="chart-carbon"></canvas></div>
         </div>
         <div class="panel carbon-right">
@@ -677,21 +660,21 @@
               <circle cx="80" cy="80" r="68" fill="none" stroke="#1a4060" stroke-width="10"/>
               <circle id="progress-arc" cx="80" cy="80" r="68" fill="none"
                 stroke="#4df0b4" stroke-width="10" stroke-linecap="round"
-                stroke-dasharray="427.26" stroke-dashoffset="93.99"/>
+                stroke-dasharray="427.26" stroke-dashoffset="402.55"/>
             </svg>
             <div class="progress-ring__label">
-              <span class="progress-ring__pct">78%</span>
-              <span class="progress-ring__text">年度目标完成</span>
+              <span class="progress-ring__pct">5.7%</span>
+              <span class="progress-ring__text">投资回报率 ROI</span>
             </div>
           </div>
           <div class="carbon-stats">
             <div>
-              <div class="carbon-stat__value" id="carbon-month">164t</div>
-              <div class="carbon-stat__label">本月减排</div>
+              <div class="carbon-stat__value" id="carbon-month">31.7万</div>
+              <div class="carbon-stat__label">电费节省（6个月）</div>
             </div>
             <div>
-              <div class="carbon-stat__value" id="carbon-total">982t</div>
-              <div class="carbon-stat__label">累计减排</div>
+              <div class="carbon-stat__value" id="carbon-total">37.3万kWh</div>
+              <div class="carbon-stat__label">累计节电量</div>
             </div>
           </div>
         </div>
@@ -701,8 +684,8 @@
   </main>
 
   <footer class="site-footer">
-    <span>绿色节能系统 v2.0 &nbsp;·&nbsp; 监测点: 3个冷水塔组</span>
-    <span>节能降碳 &nbsp;绿色发展</span>
+    <span>抗垢卫士智慧监管平台 v2.0 &nbsp;·&nbsp; 国网长乐路办公区 · 样板组/对照组</span>
+    <span>数据来源：应用分析报告（2025.04起）</span>
   </footer>
 
   <script>
@@ -747,71 +730,64 @@
       }
     };
 
-    const hours = Array.from({ length: 24 }, (_, i) => `${String(i).padStart(2,'0')}:00`);
-    const months = ['1月','2月','3月','4月','5月','6月','7月','8月','9月','10月','11月','12月'];
-    const RING_CIRC = 427.26;
-    const carbonPct = [78, 75, 74];
-    const copBases = [5.38, 5.21, 5.13];
+    /* ── 国网评估报告数据（2025.04起）── */
+    const runMonths = ['4月', '5月', '6月', '7月', '8月', '9月'];
+    const sampleKwh = [587500, 754300, 981100, 1205700, 1118400, 859200];
+    const controlKwh = [587500, 773600, 1018200, 1315800, 1245500, 938700];
+    const monthlySaving = [0, 19300, 37100, 110100, 127100, 79500];
 
-    function genWave(base, amp, len) {
-      return Array.from({ length: len }, (_, i) =>
-        +(base + amp * Math.sin(i * 0.5) + (Math.random() - 0.5) * amp * 0.4).toFixed(2)
-      );
-    }
+    const waterMonths = ['原水', '1月', '2月', '3月', '4月', '5月', '6月', '7月', '8月'];
+    const waterPh = [7.88, 7.93, 8.18, 8.42, 8.62, 8.74, 8.81, 7.68, 8.01];
+    const waterCond = [185, 365, 630, 1444, 1989, 2297, 2502, 175, 344];
 
-    const copChartData = copBases.map(b => genWave(b, 0.3, 24));
-
-    const waterBases = [{ ph: 8.12, lsi: 0.32 }, { ph: 8.05, lsi: 0.28 }, { ph: 8.18, lsi: 0.41 }];
-    const waterChartData = waterBases.map(b => ({
-      ph: genWave(b.ph, 0.15, 24),
-      lsi: genWave(b.lsi, 0.12, 24)
-    }));
-
-    /* ── Tower data ── */
-    const towerData = [
-      { cop: '5.38', saving: '19.2%', inlet: '32.4°C', outlet: '27.1°C', deltaT: '5.3°C', flow: '186 m³/h', power: '42.6 kW' },
-      { cop: '5.21', saving: '18.1%', inlet: '33.1°C', outlet: '27.8°C', deltaT: '5.3°C', flow: '172 m³/h', power: '45.2 kW' },
-      { cop: '5.13', saving: '18.5%', inlet: '32.8°C', outlet: '28.0°C', deltaT: '4.8°C', flow: '165 m³/h', power: '46.8 kW' }
+    const groupNames = ['样板组', '对照组'];
+    const groupData = [
+      { name: '样板组', kwh: '85.9万', scale: '0 mm', inlet: '25.7°C', outlet: '20.7°C', deltaT: '5.0°C', flow: '500 m³/h', power: '20 kW' },
+      { name: '对照组', kwh: '93.9万', scale: '1.2 mm', inlet: '25.7°C', outlet: '21.4°C', deltaT: '4.3°C', flow: '500 m³/h', power: '20 kW' }
     ];
 
     const waterData = [
-      { lsi: '0.32', cycle: '4.2', ph: '8.12', cond: '1850 μS/cm' },
-      { lsi: '0.28', cycle: '3.9', ph: '8.05', cond: '1720 μS/cm' },
-      { lsi: '0.41', cycle: '4.5', ph: '8.18', cond: '1980 μS/cm' }
+      { label: '原水', ca: '26 mg/L', cycle: '1.0', ph: '7.88', cond: '185 μS/cm', tds: '90 ppm' },
+      { label: '第6月', ca: '180 mg/L', cycle: '7.5', ph: '8.81', cond: '2502 μS/cm', tds: '1220 ppm' },
+      { label: '第8月', ca: '59 mg/L', cycle: '1.7', ph: '8.01', cond: '344 μS/cm', tds: '170 ppm' }
     ];
 
-    const carbonData = [
-      { month: '164t', total: '982t', monthly: [72,85,90,78,95,102,88,110,98,105,92,164] },
-      { month: '158t', total: '945t', monthly: [68,80,88,75,90,98,85,105,95,100,88,158] },
-      { month: '152t', total: '929t', monthly: [65,78,85,72,88,95,82,100,92,98,85,152] }
-    ];
-
-    const towerColors = ['#4df0b4', '#5ab8e8', '#8a7ad8'];
-    const towerColorsDim = ['rgba(77,240,180,0.25)', 'rgba(90,184,232,0.25)', 'rgba(138,122,216,0.25)'];
+    const towerColors = ['#4df0b4', '#5ab8e8'];
 
     let charts = { cop: null, water: null, carbon: null };
     let selectedTowers = new Set([0]);
     let activePoint = 0;
-    let activeCarbonTower = 0;
     const initialized = { energy: false, water: false, carbon: false };
 
-    /* ── COP Chart ── */
+    /* ── 月耗电量对比图 ── */
     function initCopChart() {
       const ctx = document.getElementById('chart-cop').getContext('2d');
       charts.cop = new Chart(ctx, {
         type: 'line',
         data: {
-          labels: hours,
-          datasets: [0,1,2].map(i => ({
-            label: `塔组 #${i+1}`,
-            data: copChartData[i],
-            borderColor: towerColors[i],
-            backgroundColor: 'transparent',
-            borderWidth: 2,
-            pointRadius: 0,
-            tension: 0.4,
-            hidden: i !== 0
-          }))
+          labels: runMonths,
+          datasets: [
+            {
+              label: '样板组',
+              data: sampleKwh,
+              borderColor: towerColors[0],
+              backgroundColor: 'transparent',
+              borderWidth: 2,
+              pointRadius: 3,
+              tension: 0.3,
+              hidden: false
+            },
+            {
+              label: '对照组',
+              data: controlKwh,
+              borderColor: towerColors[1],
+              backgroundColor: 'transparent',
+              borderWidth: 2,
+              pointRadius: 3,
+              tension: 0.3,
+              hidden: true
+            }
+          ]
         },
         options: {
           ...chartDefaults,
@@ -821,7 +797,14 @@
           },
           scales: {
             ...chartDefaults.scales,
-            y: { ...chartDefaults.scales.y, title: { display: true, text: 'COP', color: '#5a8aaa' } }
+            y: {
+              ...chartDefaults.scales.y,
+              title: { display: true, text: 'kWh', color: '#5a8aaa' },
+              ticks: {
+                ...chartDefaults.scales.y.ticks,
+                callback: v => (v / 10000).toFixed(0) + '万'
+              }
+            }
           }
         }
       });
@@ -832,7 +815,7 @@
     }
 
     function updateCompareLabel() {
-      const names = getSelectedTowersSorted().map(i => `塔组 #${i + 1}`);
+      const names = getSelectedTowersSorted().map(i => groupNames[i]);
       document.getElementById('tower-compare-text').textContent = names.join('、');
     }
 
@@ -853,10 +836,10 @@
     }
 
     function fillEnergyDetail(idx) {
-      const d = towerData[idx];
-      document.getElementById('energy-tower-label').textContent = `塔组 #${idx + 1}`;
-      document.getElementById('s-cop').textContent = d.cop;
-      document.getElementById('s-saving').textContent = d.saving;
+      const d = groupData[idx];
+      document.getElementById('energy-tower-label').textContent = d.name;
+      document.getElementById('s-kwh').textContent = d.kwh;
+      document.getElementById('s-scale').textContent = d.scale;
       document.getElementById('s-inlet').textContent = d.inlet;
       document.getElementById('s-outlet').textContent = d.outlet;
       document.getElementById('s-delta').textContent = d.deltaT;
@@ -892,33 +875,32 @@
       syncEnergyTowerUI();
     }
 
-    /* ── Water Chart ── */
+    /* ── 水质月度趋势图 ── */
     function initWaterChart() {
       const ctx = document.getElementById('chart-water').getContext('2d');
-      const initial = waterChartData[activePoint];
       charts.water = new Chart(ctx, {
         type: 'line',
         data: {
-          labels: Array.from({ length: 24 }, (_, i) => `${i}h`),
+          labels: waterMonths,
           datasets: [
             {
               label: 'pH',
-              data: initial.ph,
+              data: waterPh,
               borderColor: '#4df0b4',
               backgroundColor: 'transparent',
               borderWidth: 2,
-              pointRadius: 0,
-              tension: 0.4,
+              pointRadius: 3,
+              tension: 0.3,
               yAxisID: 'y'
             },
             {
-              label: 'LSI 指数',
-              data: initial.lsi,
+              label: '电导率 (μS/cm)',
+              data: waterCond,
               borderColor: '#5ab8e8',
               backgroundColor: 'transparent',
               borderWidth: 2,
-              pointRadius: 0,
-              tension: 0.4,
+              pointRadius: 3,
+              tension: 0.3,
               yAxisID: 'y1'
             }
           ]
@@ -937,33 +919,25 @@
               position: 'right',
               ticks: { color: '#5ab8e8', font: { family: 'Courier New', size: 10 } },
               grid: { drawOnChartArea: false },
-              title: { display: true, text: 'LSI', color: '#5ab8e8' }
+              title: { display: true, text: 'μS/cm', color: '#5ab8e8' }
             }
           }
         }
       });
     }
 
-    function refreshWaterChart(point) {
-      if (!charts.water) return;
-      const d = waterChartData[point];
-      charts.water.data.datasets[0].data = d.ph;
-      charts.water.data.datasets[1].data = d.lsi;
-      charts.water.update();
-    }
-
-    /* ── Carbon Chart ── */
+    /* ── 月度节电量柱状图 ── */
     function initCarbonChart() {
       const ctx = document.getElementById('chart-carbon').getContext('2d');
       charts.carbon = new Chart(ctx, {
         type: 'bar',
         data: {
-          labels: months,
+          labels: runMonths,
           datasets: [{
-            label: '月减排量 (t)',
-            data: carbonData[0].monthly,
-            backgroundColor: months.map((_, i) =>
-              i === 11 ? 'rgba(77,240,180,0.85)' : 'rgba(77,240,180,0.35)'
+            label: '月节电量 (kWh)',
+            data: monthlySaving,
+            backgroundColor: runMonths.map((_, i) =>
+              i === 5 ? 'rgba(77,240,180,0.85)' : 'rgba(77,240,180,0.35)'
             ),
             borderColor: '#4df0b4',
             borderWidth: 1,
@@ -974,41 +948,20 @@
           ...chartDefaults,
           scales: {
             ...chartDefaults.scales,
-            y: { ...chartDefaults.scales.y, title: { display: true, text: 'tCO₂', color: '#5a8aaa' } }
+            y: { ...chartDefaults.scales.y, title: { display: true, text: 'kWh', color: '#5a8aaa' } }
           }
         }
       });
     }
 
-    function refreshCarbonChart(tower) {
-      if (!charts.carbon) return;
-      const d = carbonData[tower].monthly;
-      charts.carbon.data.datasets[0].data = d;
-      charts.carbon.data.datasets[0].backgroundColor = months.map((_, i) =>
-        i === 11 ? 'rgba(77,240,180,0.85)' : 'rgba(77,240,180,0.35)'
-      );
-      charts.carbon.update();
-    }
-
     function updateWaterPanel(idx) {
       const d = waterData[idx];
-      document.getElementById('water-point-label').textContent = `监测点 #${idx + 1}`;
-      document.getElementById('w-lsi').textContent = d.lsi;
+      document.getElementById('water-point-label').textContent = d.label;
+      document.getElementById('w-ca').textContent = d.ca;
       document.getElementById('w-cycle').textContent = d.cycle;
       document.getElementById('w-ph').textContent = d.ph;
       document.getElementById('w-cond').textContent = d.cond;
-      refreshWaterChart(idx);
-    }
-
-    function updateCarbonPanel(idx) {
-      const d = carbonData[idx];
-      const pct = carbonPct[idx];
-      document.getElementById('carbon-tower-label').textContent = `塔组 #${idx + 1}`;
-      document.getElementById('carbon-month').textContent = d.month;
-      document.getElementById('carbon-total').textContent = d.total;
-      document.getElementById('progress-arc').style.strokeDashoffset = RING_CIRC * (1 - pct / 100);
-      document.querySelector('.progress-ring__pct').textContent = pct + '%';
-      refreshCarbonChart(idx);
+      document.getElementById('w-tds').textContent = d.tds;
     }
 
     /* ── Stat card count-up ── */
@@ -1027,20 +980,6 @@
       requestAnimationFrame(tick);
     }
 
-    /* ── COP live scroll ── */
-    function tickCopChart() {
-      if (!charts.cop) return;
-      const lastLabel = hours[hours.length - 1];
-      const h = parseInt(lastLabel, 10);
-      hours.shift();
-      hours.push(`${String((h + 1) % 24).padStart(2, '0')}:00`);
-      charts.cop.data.datasets.forEach((ds, i) => {
-        ds.data.shift();
-        ds.data.push(+(copBases[i] + (Math.random() - 0.5) * 0.3).toFixed(2));
-      });
-      charts.cop.update('none');
-    }
-
     /* ── Tab switching ── */
     document.querySelectorAll('.tab-btn').forEach(btn => {
       btn.addEventListener('click', () => {
@@ -1056,6 +995,7 @@
           initialized.energy = true;
         } else if (tab === 'water' && !initialized.water) {
           initWaterChart();
+          updateWaterPanel(activePoint);
           initialized.water = true;
         } else if (tab === 'carbon' && !initialized.carbon) {
           initCarbonChart();
@@ -1083,28 +1023,16 @@
       updateWaterPanel(activePoint);
     });
 
-    /* ── Tower switch (carbon) ── */
-    document.getElementById('carbon-tower-switch').addEventListener('click', e => {
-      const btn = e.target.closest('.switch-btn');
-      if (!btn) return;
-      document.querySelectorAll('#carbon-tower-switch .switch-btn').forEach(b => b.classList.remove('active'));
-      btn.classList.add('active');
-      activeCarbonTower = +btn.dataset.carbonTower;
-      updateCarbonPanel(activeCarbonTower);
-    });
-
     /* ── Init first tab chart on load ── */
     window.addEventListener('DOMContentLoaded', () => {
-      countUp('stat-saving', 18.6, 1, 1200, '%');
-      countUp('stat-carbon', 2856, 0, 1200, ' tCO₂');
-      countUp('stat-cop', 5.24, 2);
-      countUp('stat-cost', 486.5, 1, 1200, '万元');
+      countUp('stat-saving', 6.35, 2, 1200, '%');
+      countUp('stat-kwh', 373100, 0, 1200, ' kWh');
+      countUp('stat-scale', 0, 1, 1200, ' mm');
+      countUp('stat-cost', 31.7, 1, 1200, '万元');
 
       initCopChart();
       syncEnergyTowerUI();
       initialized.energy = true;
-
-      setInterval(tickCopChart, 3000);
     });
   </script>
 </body>
