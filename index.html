@@ -214,6 +214,7 @@
 
     .tower-switch, .point-switch {
       display: flex;
+      flex-wrap: wrap;
       gap: 8px;
       margin-bottom: 16px;
     }
@@ -626,23 +627,32 @@
     <!-- ═══ Tab 2: 水质监测 ═══ -->
     <section class="tab-panel" id="panel-water">
       <div class="point-switch">
-        <button class="switch-btn active" data-point="0">原水</button>
-        <button class="switch-btn" data-point="1">第6月</button>
-        <button class="switch-btn" data-point="2">第8月</button>
+        <button class="switch-btn active" data-point="0">第1月</button>
+        <button class="switch-btn" data-point="1">第2月</button>
+        <button class="switch-btn" data-point="2">第3月</button>
+        <button class="switch-btn" data-point="3">第4月</button>
+        <button class="switch-btn" data-point="4">第5月</button>
+        <button class="switch-btn" data-point="5">第6月</button>
+        <button class="switch-btn" data-point="6">第7月(换水)</button>
+        <button class="switch-btn" data-point="7">第8月</button>
       </div>
 
       <div class="panel-row">
         <div class="panel">
-          <div class="panel__title">pH / 电导率月度趋势 · <span id="water-point-label">原水</span></div>
+          <div class="panel__title">pH / 电导率月度趋势（含原水基准）</div>
           <div class="chart-wrap"><canvas id="chart-water"></canvas></div>
         </div>
         <div class="panel water-metrics status-panel">
-          <div class="panel__title">水质参数</div>
-          <div class="metric"><span class="metric__label">钙离子 Ca²⁺</span><span class="metric__value" id="w-ca">26 mg/L</span></div>
-          <div class="metric"><span class="metric__label">浓缩倍数</span><span class="metric__value" id="w-cycle">1.0</span></div>
-          <div class="metric"><span class="metric__label">pH</span><span class="metric__value" id="w-ph">7.88</span></div>
-          <div class="metric"><span class="metric__label">电导率</span><span class="metric__value" id="w-cond">185 μS/cm</span></div>
-          <div class="metric"><span class="metric__label">TDS</span><span class="metric__value" id="w-tds">90 ppm</span></div>
+          <div class="panel__title">水质参数 · <span id="water-point-label">第1月</span></div>
+          <div class="metric"><span class="metric__label">pH</span><span class="metric__value" id="w-ph">7.93</span></div>
+          <div class="metric"><span class="metric__label">TDS</span><span class="metric__value" id="w-tds">178 ppm</span></div>
+          <div class="metric"><span class="metric__label">钙离子 Ca²⁺</span><span class="metric__value" id="w-ca">51 mg/L</span></div>
+          <div class="metric"><span class="metric__label">镁离子 Mg²⁺</span><span class="metric__value" id="w-mg">142 mg/L</span></div>
+          <div class="metric"><span class="metric__label">电导率</span><span class="metric__value" id="w-cond">365 μS/cm</span></div>
+          <div class="metric"><span class="metric__label">浊度</span><span class="metric__value" id="w-turb">2.35 NTU</span></div>
+          <div class="metric"><span class="metric__label">总硬度</span><span class="metric__value" id="w-hard">190 mg/L</span></div>
+          <div class="metric"><span class="metric__label">总碱度</span><span class="metric__value" id="w-alk">206 mg/L</span></div>
+          <div class="metric"><span class="metric__label">浓缩倍数</span><span class="metric__value" id="w-cycle">1.6</span></div>
         </div>
       </div>
     </section>
@@ -746,10 +756,16 @@
       { name: '对照组', kwh: '93.9万', scale: '1.2 mm', inlet: '25.7°C', outlet: '21.4°C', deltaT: '4.3°C', flow: '500 m³/h', power: '20 kW' }
     ];
 
+    /* 各月水质监测结果（与评估报告表一致，索引 0=第1月 … 7=第8月） */
     const waterData = [
-      { label: '原水', ca: '26 mg/L', cycle: '1.0', ph: '7.88', cond: '185 μS/cm', tds: '90 ppm' },
-      { label: '第6月', ca: '180 mg/L', cycle: '7.5', ph: '8.81', cond: '2502 μS/cm', tds: '1220 ppm' },
-      { label: '第8月', ca: '59 mg/L', cycle: '1.7', ph: '8.01', cond: '344 μS/cm', tds: '170 ppm' }
+      { label: '第1月', ph: '7.93', tds: '178 ppm', ca: '51 mg/L', mg: '142 mg/L', cond: '365 μS/cm', turb: '2.35 NTU', hard: '190 mg/L', alk: '206 mg/L', cycle: '1.6' },
+      { label: '第2月', ph: '8.18', tds: '307 ppm', ca: '88 mg/L', mg: '244 mg/L', cond: '630 μS/cm', turb: '3.12 NTU', hard: '328 mg/L', alk: '356 mg/L', cycle: '2.8' },
+      { label: '第3月', ph: '8.42', tds: '704 ppm', ca: '150 mg/L', mg: '416 mg/L', cond: '1444 μS/cm', turb: '3.63 NTU', hard: '808 mg/L', alk: '352 mg/L', cycle: '4.0' },
+      { label: '第4月', ph: '8.62', tds: '970 ppm', ca: '172 mg/L', mg: '478 mg/L', cond: '1989 μS/cm', turb: '3.40 NTU', hard: '1114 mg/L', alk: '410 mg/L', cycle: '5.1' },
+      { label: '第5月', ph: '8.74', tds: '1120 ppm', ca: '178 mg/L', mg: '494 mg/L', cond: '2297 μS/cm', turb: '3.05 NTU', hard: '1268 mg/L', alk: '442 mg/L', cycle: '6.3' },
+      { label: '第6月', ph: '8.81', tds: '1220 ppm', ca: '180 mg/L', mg: '499 mg/L', cond: '2502 μS/cm', turb: '2.80 NTU', hard: '1342 mg/L', alk: '458 mg/L', cycle: '7.5' },
+      { label: '第7月(换水)', ph: '7.68', tds: '96 ppm', ca: '33 mg/L', mg: '64 mg/L', cond: '175 μS/cm', turb: '1.88 NTU', hard: '97 mg/L', alk: '121 mg/L', cycle: '1.0' },
+      { label: '第8月', ph: '8.01', tds: '170 ppm', ca: '59 mg/L', mg: '133 mg/L', cond: '344 μS/cm', turb: '2.48 NTU', hard: '192 mg/L', alk: '249 mg/L', cycle: '1.7' }
     ];
 
     const towerColors = ['#4df0b4', '#5ab8e8'];
@@ -957,11 +973,15 @@
     function updateWaterPanel(idx) {
       const d = waterData[idx];
       document.getElementById('water-point-label').textContent = d.label;
-      document.getElementById('w-ca').textContent = d.ca;
-      document.getElementById('w-cycle').textContent = d.cycle;
       document.getElementById('w-ph').textContent = d.ph;
-      document.getElementById('w-cond').textContent = d.cond;
       document.getElementById('w-tds').textContent = d.tds;
+      document.getElementById('w-ca').textContent = d.ca;
+      document.getElementById('w-mg').textContent = d.mg;
+      document.getElementById('w-cond').textContent = d.cond;
+      document.getElementById('w-turb').textContent = d.turb;
+      document.getElementById('w-hard').textContent = d.hard;
+      document.getElementById('w-alk').textContent = d.alk;
+      document.getElementById('w-cycle').textContent = d.cycle;
     }
 
     /* ── Stat card count-up ── */
